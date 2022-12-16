@@ -160,7 +160,7 @@ let resultWindow = () => {
     returnBtn.setAttribute('onclick', 'startPage()');
 
 /*ELEMENT RENDER*/
-    boardTop.replaceChildren(resultList)
+    boardTop.replaceChildren(resultTitle, resultList)
     boardBot.replaceChildren(returnBtn);
 }
 
