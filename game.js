@@ -1,9 +1,10 @@
 let boardTop = document.getElementById('board-top');
 let boardBot = document.getElementById('board-bot');
 let resultHistory = [];
+let score = 0;
 let gameOptions = {
     dificulty: undefined,
-    numRange: undefined,
+    numRange: 10,
     mathOperations: ['sum', 'res', 'multi', 'div']
 };
 /*#########
@@ -38,6 +39,12 @@ let gameStart = () => {
     let activeOperators = gameOptions.mathOperations;
     let numRegex = /^\-*[0-9]+(.[0-9]*)?$/;
     let correctAnswer, inputAnswer;
+    let numGen0 = () => { //for numbers 0 and up
+        return Math.round(Math.random() * gameOptions.numRange)
+    }
+    let numGen1 =  ()  => { //for numbers 1 and up
+        return Math.ceil(Math.random() * gameOptions.numRange)
+    }
 
     //Math generator
     function mathGen() {
@@ -45,28 +52,28 @@ let gameStart = () => {
         let opeRandom = Math.round(Math.random() * (activeOperators.length - 1));
         switch (activeOperators[opeRandom]) {
             case 'sum':
-            a = Math.round(Math.random() * 10);
-            b = Math.round(Math.random() * 10);
+            a = numGen0();
+            b = numGen0();
             correctAnswer = a + b;
             mathText.textContent = `${a} + ${b}`;
             break;
         case 'res':
-            a = Math.round(Math.random() * 10);
-            b = Math.round(Math.random() * 10);
+            a = numGen0();
+            b = numGen0();
             correctAnswer = a - b;
             mathText.textContent = `${a} - ${b}`;
             break;
         case 'multi':
-            a = Math.round(Math.random() * 10);
-            b = Math.round(Math.random() * 10);
+            a = numGen0();
+            b = numGen0();
             correctAnswer = a * b;
             mathText.textContent = `${a} x ${b}`
             break;
         case 'div':
-            a = Math.ceil(Math.random() * 10);
-            b = Math.ceil(Math.random() * 10);
+            a = numGen1();
+            b = numGen1();
             if ((a % b) != 0) { 
-                correctAnswer = parseFloat((a / b).toFixed(2)) 
+                correctAnswer = parseFloat((a / b).toFixed(2)) //TODO: FIX ROUNDING ISSUE 
             } else { 
                 correctAnswer = a / b 
             };
@@ -80,6 +87,7 @@ let gameStart = () => {
     //Answer Check
     function answerCheck (val1, val2) {
         if (val1 == val2) {
+            score++;
             return 'correct'
         } else {return 'wrong'}
     }
@@ -103,8 +111,9 @@ let gameStart = () => {
                 event.preventDefault();
                 //console.log(`${mathText.textContent}`)
                 console.log(`input is ${inputAnswer}, answer is ${correctAnswer}`);
-                console.log(answerCheck(inputAnswer, correctAnswer));
+                //console.log(answerCheck(inputAnswer, correctAnswer));
                 resultHistory.push(`${mathText.textContent} = ${inputAnswer} ${answerCheck(inputAnswer, correctAnswer)}`)
+                console.log(`the score is ${score}`)
                 //console.log(resultHistory);
                 inputArea.value = "";
                 mathGen()
@@ -151,6 +160,12 @@ let resultWindow = () => {
         answerLine.textContent = result;
     })
 
+    let scoreResult = document.createElement('p');
+    scoreResult.textContent = score;
+    //Clear scores and results
+    score = 0;
+    resultHistory = [];
+
 /*BOART BOTTOM*/
     let returnBtn = document.createElement('button');
     returnBtn.classList.add('button');
@@ -160,7 +175,7 @@ let resultWindow = () => {
     returnBtn.setAttribute('onclick', 'startPage()');
 
 /*ELEMENT RENDER*/
-    boardTop.replaceChildren(resultTitle, resultList)
+    boardTop.replaceChildren(resultTitle, resultList, scoreResult)
     boardBot.replaceChildren(returnBtn);
 }
 
