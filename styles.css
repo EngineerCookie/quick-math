@@ -19,19 +19,37 @@ main {
     height: 100%; 
 }
 
-.board {
+#workspace {
     height: 50vh;
-    width: 75%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background-color: red;
 }
 
-.display {
-    height: 30%;
+#board-top {
+    height: 85%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: green;
 }
 
-h1 {
-    margin: 0;
+#board-bot {
+    height: 15%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: blue
+}
+
+.start-btn {
+    width: 150px;
+    height: 50px;
 }

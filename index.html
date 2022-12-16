@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,18 +8,22 @@
     <title>Quick-math game</title>
     <link rel="shortcut icon" href="#" />
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+    <script src="game.js" defer></script>
+
 </head>
+
 <body>
     <main>
         <h1>Quick Math Game</h1>
-        <div class="board">
-            <div class="display">
-                <span data-math-problem></span>
+        <div id="workspace">
+            <div id="board-top">
             </div>
-            <input id="answer-box" /> 
+            <div id="board-bot">
+                <!--<input id="answer-box" />-->
+            </div>
         </div>
     </main>
     <footer></footer>
 </body>
+
 </html>
