@@ -1,13 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredericka+the+Great&family=Schoolbell&display=swap');
+
+/*#########
+GLOBAL CSS
+##########*/
+
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
+:root {
+    font-size: 18px;
+    /*
+VARIABLES
+########*/
+    /*COLORS*/
+    /*##PRIMARY*/
+    /*####DARK GREEN*/
+    --color-main-h: 118;
+    --color-main-s: 71%;
+    --color-main-l: 8%;
+    /*##SECONDARY*/
+    /*####WHITE*/
+    --color-sub-h: 360;
+    --color-sub-s: 100%;
+    --color-sub-l: 100%;
+    /*FONT*/
+    --ff-outside: 'Schoolbell', cursive;
+    --ff-inside: 'Fredericka the Great', cursive;
+    --fs-title: 3rem;
+    --fs-normal: 2rem;
+    --fs-note: 1.5rem;
+}
+
 body {
     width: 100%;
     height: 100vh;
-    background-color: lavender;
+    background-color: BurlyWood;
     margin: 0;
 }
 
@@ -16,27 +46,41 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%; 
+    height: 100%;
+}
+
+main>h1 {
+    font-family: var(--ff-outside);
+    font-size: var(--fs-title);
+    margin: 0;
 }
 
 #workspace {
-    height: 50vh;
+    height: 65vh;
+    min-height: 720px;
     width: 50%;
+    min-width: 720px;
+    font-family: var(--ff-inside);
+    color: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: red;
+    background-image: url('./src/img/board.jpg');
+    background-size: cover;
+    background-color: hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l));
+    border: solid 5px rgb(56, 16, 16);
 }
+
 
 #board-top {
     height: 85%;
     width: 100%;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: green;
 }
 
 #board-bot {
@@ -46,10 +90,141 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: blue
 }
 
-.start-btn {
-    width: 150px;
-    height: 50px;
+.button {
+    padding: 0.5rem 1.5rem;
+    font-size: var(--fs-normal);
+    font-family: var(--ff-inside);
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    transition: ease-in-out 0.5s;
+}
+
+.button:hover {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
+@media (max-width: 720px) {
+    main>h1 {
+        font-size: var(--fs-normal)
+    }
+
+    #workspace {
+        width: 100%;
+        min-width: 100%;
+    }
+    .button:hover {
+        transform: scale(1);
+        cursor: pointer;
+        border: solid 1px hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    }
+}
+
+
+/*#########
+START PAGE CSS
+##########*/
+
+
+/*#########
+COUNTDOWN CSS
+##########*/
+.countdown {
+    width: 125px;
+    height: 125px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.countdown-number {
+    font-size: var(--fs-title);
+}
+
+/*#########
+GAMES START CSS
+##########*/
+.time-bar {
+    height: 10px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+
+.time-rem {
+    height: 100%;
+    background-color: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    animation-name: timer-bar;
+    animation-timing-function: linear;
+}
+
+@keyframes timer-bar {
+    0% {
+        width: 100%;
+    }
+
+    100% {
+        width: 0%;
+    }
+}
+
+.math-text {
+    font-size: var(--fs-title);
+}
+
+#user-answer {
+    width: 25%;
+    font-size: var(--fs-normal);
+}
+
+@media (max-width: 720px) {
+    #user-answer {
+        width: 75%;
+    }
+}
+
+/*#########
+RESULT WINDOW CSS
+##########*/
+.result-title {
+    font-size: var(--fs-title);
+    margin: 0;
+    text-transform: uppercase;
+    justify-self: flex-start;
+}
+
+.result-list {
+    margin: 0;
+    padding: 0;
+    max-height: 60%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow: auto;
+}
+
+.answer {
+    list-style: none;
+    width: max-content;
+    margin: 0.5rem;
+    padding: 0.2rem;
+    height: max-content;
+    font-size: var(--fs-note);
+}
+
+.answer[data-result='wrong'] {
+    border: solid 2px hsla(360, 100%, 46%, 1);
+    background-color: hsla(360, 100%, 46%, 1);
+}
+
+.result-text {
+    font-size: var(--fs-note);
+    text-transform: uppercase;
 }
