@@ -3,33 +3,113 @@ let boardBot = document.getElementById('board-bot');
 let resultHistory = [];
 let score = 0;
 let gameOptions = {
-    time: 15000,
-    numRange: 10,
-    mathOperations: ['sum', 'res', 'multi', 'div']
+    time: undefined, 
+    numRange: undefined, 
+    mathOperations: [] 
 };
+
 /*#########
 START PAGE
 ###########*/
 let startPage = () => {
     /*FUNCTION VARIABLES*/
+    let options = {
+        time: [15000, 30000, 60000], //can only choose one
+        range: [10, 100, 1000, 9999], //can only choose one
+        mathOps: [['+', '-'], ['x', '÷'], ['#²', '√#']] //multiple choise
+    }
+    //This function creats a checkbox  element for every option available.
+    let settingLoop = (setting, option) => { 
+        option.forEach(selection => {
+            let label = document.createElement('label');
+            setting.appendChild(label);
 
+            let checkbox = document.createElement('input');
+            checkbox.classList.add('setting-checkbox');
+            checkbox.setAttribute('value', option.indexOf(selection));
 
+            let text = document.createElement('span');
+            text.classList.add('setting-text');
+
+            switch (option) {
+                case options.time:
+                    checkbox.setAttribute('type', 'radio');
+                    checkbox.setAttribute('name', 'time');
+                    text.textContent = `${selection/1000}s`;
+                    break;
+                case options.range:
+                    checkbox.setAttribute('type', 'radio');
+                    checkbox.setAttribute('name', 'range');
+                    text.textContent = `< ${selection}`;
+                    break;
+                case options.mathOps:
+                    checkbox.setAttribute('type', 'checkbox');
+                    checkbox.setAttribute('name', 'operation')
+                    text.textContent = `${selection[0]}  ${selection[1]}`;
+                    break;
+                default:
+                    console.log('Something went wrong with settingLoop');
+            }
+            label.appendChild(checkbox);
+            label.appendChild(text);
+            
+        })
+    }
+    
     /*BOARD TOP*/
-    let titleTest = document.createElement('h1');
-    titleTest.textContent = 'TESTING TITLE'
+    let settingTitle = document.createElement('span');
+    settingTitle.classList.add('setting-title');
+    settingTitle.textContent = 'Settings';
+    
+    let timeSetting = document.createElement('div');
+    timeSetting.classList.add('setting-option');
+    
+    let rangeSetting = document.createElement('div');
+    rangeSetting.classList.add('setting-option');
+
+    let mathSetting = document.createElement('div');
+    mathSetting.classList.add('setting-option');
+
+    let settingWindow = document.createElement('div');
+    settingWindow.classList.add('setting-window');
+
+    settingWindow.appendChild(timeSetting);
+    settingLoop(timeSetting, options.time);
+
+    settingWindow.appendChild(rangeSetting);
+    settingLoop(rangeSetting, options.range);
+
+    settingWindow.appendChild(mathSetting);
+    settingLoop (mathSetting, options.mathOps);
 
     /*BOARD BOTTOM*/
     let startBtn = document.createElement('button');
     startBtn.classList.add('button');
     startBtn.setAttribute('id', 'start-btn');
     startBtn.setAttribute('type', 'button');
-    startBtn.setAttribute('onclick', 'countdown()')
     startBtn.textContent = 'START GAME';
 
     /*ELEMENT RENDER*/
-    boardTop.replaceChildren(titleTest)
+    boardTop.replaceChildren(settingTitle, settingWindow)
     boardBot.replaceChildren(startBtn);
-}
+
+    startBtn.addEventListener('click', () => {
+        let checkTime = document.querySelector('[name=time]:checked');
+        let checkRange = document.querySelector('[name=range]:checked');
+        let checkOps = [];
+        document.querySelectorAll('[name=operation]:checked').forEach(sel => {
+            checkOps.push(sel.value)
+        });
+        gameOptions.time = options.time[checkTime.value];
+        gameOptions.numRange = options.range[checkRange.value];
+        checkOps.forEach(check  => {
+            gameOptions.mathOperations.push(...options.mathOps[check])
+        })
+        console.log(gameOptions);
+        if ( gameOptions.time == undefined || gameOptions.numRange == undefined || gameOptions.mathOperations == [])  {
+            console.log(`wrong setting`)
+        } else {countdown()}
+})}
 
 /*#########
 COUNTDOWN BEFORE GAMESTART PAGE
@@ -72,42 +152,55 @@ let gameStart = () => {
     let numGen1 = () => { //for numbers 1 and up
         return Math.ceil(Math.random() * gameOptions.numRange)
     }
-
     //Math generator
     function mathGen() {
         let a, b;
         let opeRandom = Math.round(Math.random() * (activeOperators.length - 1));
         switch (activeOperators[opeRandom]) {
-            case 'sum':
+            case '+':
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a + b;
                 mathText.textContent = `${a} + ${b}`;
                 break;
-            case 'res':
+            case '-':
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a - b;
                 mathText.textContent = `${a} - ${b}`;
                 break;
-            case 'multi':
+            case 'x':
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a * b;
                 mathText.textContent = `${a} x ${b}`
                 break;
-            case 'div':
+            case '÷':
                 a = numGen1();
                 b = numGen1();
                 if ((a % b) != 0) {
-                    correctAnswer = parseFloat((a / b).toFixed(2)) //TODO: FIX ROUNDING ISSUE 
+                    correctAnswer = +((a / b).toString().match(/^-?\d+(?:\.\d{0,2})?/)[0])
+                    //FROM https://stackoverflow.com/questions/4187146/truncate-number-to-two-decimal-places-without-rounding
                 } else {
                     correctAnswer = a / b
                 };
                 mathText.textContent = `${a} ÷ ${b}`;
+                console.log(correctAnswer);
+                break;
+            case '#²':
+                a =  numGen1();
+                correctAnswer = a ** 2;
+                console.log(correctAnswer);
+                mathText.textContent  = `${a}²`
+                break;
+            case '√#':
+                a = numGen1();
+                correctAnswer = +(Math.sqrt(a).toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]) //FROM https://stackoverflow.com/questions/4187146/truncate-number-to-two-decimal-places-without-rounding
+                console.log(correctAnswer);
+                mathText.textContent = `√${a}`
                 break;
             default:
-                console.log(`something went wrong`);
+                console.log(`something went wrong with mathgen`);
         }
     }
 
@@ -138,10 +231,8 @@ let gameStart = () => {
     inputArea.addEventListener('keypress', (event) => {
         if (event.key === "Enter") {
             inputAnswer = +(inputArea.value);
-            //console.log(inputAnswer);
             if (numRegex.test(inputAnswer)) {
                 event.preventDefault();
-                //console.log(`${mathText.textContent}`)
                 console.log(`input is ${inputAnswer}, answer is ${correctAnswer}`);
                 resultHistory.push(
                     {
@@ -199,12 +290,16 @@ let resultWindow = () => {
 
     let scoreResult = document.createElement('p');
     scoreResult.classList.add('result-text');
-    scoreResult.textContent = `Your score is: ${score}`;
-    //Clear scores and results
+    scoreResult.textContent = `Your score is: ${score}`; //TODO Save high score on local storage
+    //Clear and resets scores, results  and  settings;
     score = 0;
     resultHistory = [];
+    gameOptions.time = undefined;
+    gameOptions.numRange =  undefined;
+    gameOptions.mathOperations  =  [];
 
-    /*BOART BOTTOM*/
+
+    /*BOARD BOTTOM*/
     let returnBtn = document.createElement('button');
     returnBtn.classList.add('button');
     returnBtn.setAttribute('type', 'button');
