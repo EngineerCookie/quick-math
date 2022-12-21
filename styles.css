@@ -32,6 +32,7 @@ VARIABLES
     --fs-title: 3rem;
     --fs-normal: 2rem;
     --fs-note: 1.5rem;
+    --fs-detail: 1rem;
 }
 
 body {
@@ -49,12 +50,21 @@ main {
     height: 100%;
 }
 
-main>h1 {
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+main>header>h1 {
     font-family: var(--ff-outside);
     font-size: var(--fs-title);
     margin: 0;
     user-select:  none;
 }
+
+
 
 #workspace {
     height: 65vh;
@@ -124,6 +134,67 @@ main>h1 {
     }
 }
 
+/*#########
+HELP DIALOG
+##########*/
+.help:hover {
+    cursor: pointer;
+}
+
+.help > svg {
+    width:  var(--fs-normal);
+    margin-left: 1rem;
+}
+
+dialog {
+    z-index: 10;
+    font-family: var(--ff-inside);
+    color: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    padding: 0;
+    background-image: url('./src/img/board.jpg');
+    background-size: cover;
+    background-color: hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l));
+    border: solid 3px rgb(56, 16, 16);
+}
+
+.lang-btn {
+    border-bottom: 3px solid hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    width: 100%;
+}
+
+.lang-btn>button, #modal-close {
+    background-color: transparent;
+    border: none;
+    font-family: var(--ff-inside);
+    color: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    font-size: var(--fs-detail);
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem 0 1.5rem;
+}
+
+.lang-btn>button.active {
+    background-color: hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l));
+    border: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l)) solid 2px;
+}
+
+.help-text {
+    display: none;
+    padding: 1rem;
+    line-height: 1.3rem;
+    text-align: justify;
+}
+
+.help-text.active{
+    display: block;
+}
+
+#modal-close {
+    font-size: var(--fs-note);
+    transition: ease-in-out 0.5s;}
+
+#modal-close:hover {
+    border: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l)) solid 2px;
+}
 
 /*#########
 START PAGE CSS

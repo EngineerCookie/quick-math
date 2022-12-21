@@ -2,11 +2,44 @@ let boardTop = document.getElementById('board-top');
 let boardBot = document.getElementById('board-bot');
 let resultHistory = [];
 let score = 0;
-let gameOptions = {
-    time: undefined, 
-    numRange: undefined, 
-    mathOperations: [] 
+let gameSettings = {
+    time: undefined,
+    numRange: undefined,
+    mathOperations: [],
+    saveRecord: ''
 };
+/*#########
+HELP DIALOG
+###########*/
+let openHelp = document.querySelector('.help');
+let helpWindow = document.querySelector('dialog');
+let closeBtn = document.getElementById('modal-close');
+let langBtn = document.querySelectorAll('[data-lang]');
+let langTxt = document.querySelectorAll('[data-text]');
+
+openHelp.addEventListener('click', () => {
+    helpWindow.showModal()
+})
+
+closeBtn.addEventListener('click', () => {
+    helpWindow.close()
+})
+
+langBtn.forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const target = document.querySelector(btn.dataset.lang)
+        langTxt.forEach((txt) => {
+            txt.classList.remove('active')
+        })
+        langBtn.forEach((btn) => {
+            btn.classList.remove('active')
+        })
+        btn.classList.add('active');
+        target.classList.add('active');
+    })
+})
+
+
 
 /*#########
 START PAGE
@@ -14,12 +47,17 @@ START PAGE
 let startPage = () => {
     /*FUNCTION VARIABLES*/
     let options = {
-        time: [15000, 30000, 60000], //can only choose one
+        time: [30000, 60000, 180000], //can only choose one
         range: [10, 100, 1000, 9999], //can only choose one
-        mathOps: [['+', '-'], ['x', '÷'], ['#²', '√#']] //multiple choise
+        mathOps: [['+', '-'], ['x', '÷'], ['#²', '√#']], //multiple choise
+        save: { //this is for high score check
+            time: undefined,
+            range: undefined,
+            operation: []
+        }
     }
-    //This function creats a checkbox  element for every option available.
-    let settingLoop = (setting, option) => { 
+    //This function creates a checkbox  element for every option available.
+    let settingLoop = (setting, option) => {
         option.forEach(selection => {
             let label = document.createElement('label');
             setting.appendChild(label);
@@ -35,7 +73,7 @@ let startPage = () => {
                 case options.time:
                     checkbox.setAttribute('type', 'radio');
                     checkbox.setAttribute('name', 'time');
-                    text.textContent = `${selection/1000}s`;
+                    text.textContent = `${selection / 1000}s`;
                     break;
                 case options.range:
                     checkbox.setAttribute('type', 'radio');
@@ -52,18 +90,18 @@ let startPage = () => {
             }
             label.appendChild(checkbox);
             label.appendChild(text);
-            
+
         })
     }
-    
+
     /*BOARD TOP*/
     let settingTitle = document.createElement('span');
     settingTitle.classList.add('setting-title');
     settingTitle.textContent = 'Settings';
-    
+
     let timeSetting = document.createElement('div');
     timeSetting.classList.add('setting-option');
-    
+
     let rangeSetting = document.createElement('div');
     rangeSetting.classList.add('setting-option');
 
@@ -80,7 +118,9 @@ let startPage = () => {
     settingLoop(rangeSetting, options.range);
 
     settingWindow.appendChild(mathSetting);
-    settingLoop (mathSetting, options.mathOps);
+    settingLoop(mathSetting, options.mathOps);
+
+    let highScore = document.createElement('span');
 
     /*BOARD BOTTOM*/
     let startBtn = document.createElement('button');
@@ -90,26 +130,52 @@ let startPage = () => {
     startBtn.textContent = 'START GAME';
 
     /*ELEMENT RENDER*/
-    boardTop.replaceChildren(settingTitle, settingWindow)
+    boardTop.replaceChildren(settingTitle, settingWindow, highScore)
     boardBot.replaceChildren(startBtn);
+
+
+    //High score save check by setting
+    let checkbox = document.querySelectorAll('.setting-checkbox');
+    checkbox.forEach(item => {
+        item.addEventListener('click', (event) => {
+            switch (event.target.name) {
+                case 'operation':
+                    if (event.target.checked == false) {
+                        options.save.operation.splice(options.save.operation.indexOf(event.target.value), 1);
+                    } else {
+                        options.save.operation.push(event.target.value)
+                        options.save.operation.sort()
+                    }
+                    break;
+                default:
+                    options.save[event.target.name] = event.target.value
+            }
+            if (localStorage.getItem(`t${options.save.time}r${options.save.range}o${options.save.operation}`)) {
+                highScore.textContent = `Record: ${localStorage.getItem(`t${options.save.time}r${options.save.range}o${options.save.operation}`)}`
+            } else { highScore.textContent = '' }
+
+        })
+    })
 
     startBtn.addEventListener('click', () => {
         let checkTime = document.querySelector('[name=time]:checked');
         let checkRange = document.querySelector('[name=range]:checked');
         let checkOps = [];
+        gameSettings.saveRecord = `t${options.save.time}r${options.save.range}o${options.save.operation}`
         document.querySelectorAll('[name=operation]:checked').forEach(sel => {
             checkOps.push(sel.value)
         });
-        gameOptions.time = options.time[checkTime.value];
-        gameOptions.numRange = options.range[checkRange.value];
-        checkOps.forEach(check  => {
-            gameOptions.mathOperations.push(...options.mathOps[check])
+        gameSettings.time = options.time[checkTime.value];
+        gameSettings.numRange = options.range[checkRange.value];
+        checkOps.forEach(check => {
+            gameSettings.mathOperations.push(...options.mathOps[check])
         })
-        console.log(gameOptions);
-        if ( gameOptions.time == undefined || gameOptions.numRange == undefined || gameOptions.mathOperations == [])  {
+        console.log(gameSettings);
+        if (gameSettings.time == undefined || gameSettings.numRange == undefined || gameSettings.mathOperations.length < 1) {
             console.log(`wrong setting`)
-        } else {countdown()}
-})}
+        } else { countdown() }
+    })
+}
 
 /*#########
 COUNTDOWN BEFORE GAMESTART PAGE
@@ -143,14 +209,14 @@ GAME START PAGE
 ###########*/
 let gameStart = () => {
     /*FUNCTION VARIABLES*/
-    let activeOperators = gameOptions.mathOperations;
+    let activeOperators = gameSettings.mathOperations;
     let numRegex = /^\-*[0-9]+(.[0-9]*)?$/;
     let correctAnswer, inputAnswer;
     let numGen0 = () => { //for numbers 0 and up
-        return Math.round(Math.random() * gameOptions.numRange)
+        return Math.round(Math.random() * gameSettings.numRange)
     }
     let numGen1 = () => { //for numbers 1 and up
-        return Math.ceil(Math.random() * gameOptions.numRange)
+        return Math.ceil(Math.random() * gameSettings.numRange)
     }
     //Math generator
     function mathGen() {
@@ -161,13 +227,13 @@ let gameStart = () => {
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a + b;
-                mathText.textContent = `${a} + ${b}`;
+                mathText.textContent = `${a} \r\n+ ${b}`;
                 break;
             case '-':
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a - b;
-                mathText.textContent = `${a} - ${b}`;
+                mathText.textContent = `${a} \r\n- ${b}`;
                 break;
             case 'x':
                 a = numGen0();
@@ -188,15 +254,13 @@ let gameStart = () => {
                 console.log(correctAnswer);
                 break;
             case '#²':
-                a =  numGen1();
+                a = numGen1();
                 correctAnswer = a ** 2;
-                console.log(correctAnswer);
-                mathText.textContent  = `${a}²`
+                mathText.textContent = `${a}²`
                 break;
             case '√#':
                 a = numGen1();
                 correctAnswer = +(Math.sqrt(a).toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]) //FROM https://stackoverflow.com/questions/4187146/truncate-number-to-two-decimal-places-without-rounding
-                console.log(correctAnswer);
                 mathText.textContent = `√${a}`
                 break;
             default:
@@ -233,7 +297,6 @@ let gameStart = () => {
             inputAnswer = +(inputArea.value);
             if (numRegex.test(inputAnswer)) {
                 event.preventDefault();
-                console.log(`input is ${inputAnswer}, answer is ${correctAnswer}`);
                 resultHistory.push(
                     {
                         mathText: mathText.textContent,
@@ -241,7 +304,6 @@ let gameStart = () => {
                         answerResult: answerCheck(inputAnswer, correctAnswer)
                     }
                 )
-                console.log(`the score is ${score}`)
                 inputArea.value = "";
                 mathGen()
             } else {
@@ -257,7 +319,7 @@ let gameStart = () => {
     inputArea.focus(); //To type immediately in the answer box
 
     /*FUNCTION CALLBACK 1min TIMER*/
-    let time = gameOptions.time;
+    let time = gameSettings.time;
     timeRem.style.animationDuration = `${time / 1000}s`
 
     setTimeout(() => {
@@ -290,13 +352,17 @@ let resultWindow = () => {
 
     let scoreResult = document.createElement('p');
     scoreResult.classList.add('result-text');
-    scoreResult.textContent = `Your score is: ${score}`; //TODO Save high score on local storage
+    scoreResult.textContent = `Your score is: ${score}`;
+    if (score > localStorage.getItem(gameSettings.saveRecord)) { //Saving highscore to localStorage
+        localStorage.setItem(gameSettings.saveRecord, score);
+    }
     //Clear and resets scores, results  and  settings;
     score = 0;
     resultHistory = [];
-    gameOptions.time = undefined;
-    gameOptions.numRange =  undefined;
-    gameOptions.mathOperations  =  [];
+    gameSettings.time = undefined;
+    gameSettings.numRange = undefined;
+    gameSettings.mathOperations = [];
+    gameSettings.saveRecord = '';
 
 
     /*BOARD BOTTOM*/
