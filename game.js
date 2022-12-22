@@ -47,7 +47,7 @@ START PAGE
 let startPage = () => {
     /*FUNCTION VARIABLES*/
     let options = {
-        time: [30000, 60000, 180000], //can only choose one
+        time: [10000, 30000, 60000, 180000], //can only choose one
         range: [10, 100, 1000, 9999], //can only choose one
         mathOps: [['+', '-'], ['x', '÷'], ['#²', '√#']], //multiple choise
         save: { //this is for high score check
@@ -170,7 +170,6 @@ let startPage = () => {
         checkOps.forEach(check => {
             gameSettings.mathOperations.push(...options.mathOps[check])
         })
-        console.log(gameSettings);
         if (gameSettings.time == undefined || gameSettings.numRange == undefined || gameSettings.mathOperations.length < 1) {
             console.log(`wrong setting`)
         } else { countdown() }
@@ -208,6 +207,9 @@ let countdown = () => {
 GAME START PAGE
 ###########*/
 let gameStart = () => {
+    /*PLACEHOLDER:mathActive class for board-top and board-bot for mobile keypad*/
+    boardTop.classList.add('mobile');
+    boardBot.classList.add('mobile');
     /*FUNCTION VARIABLES*/
     let activeOperators = gameSettings.mathOperations;
     let numRegex = /^\-*[0-9]+(.[0-9]*)?$/;
@@ -218,6 +220,8 @@ let gameStart = () => {
     let numGen1 = () => { //for numbers 1 and up
         return Math.ceil(Math.random() * gameSettings.numRange)
     }
+    let keypadKeys = ['DEL', 'C', '7', '8', '9', '4', '5', '6', '1', '2', '3', '-', '0', '.', 'ENTER']
+
     //Math generator
     function mathGen() {
         let a, b;
@@ -227,13 +231,13 @@ let gameStart = () => {
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a + b;
-                mathText.textContent = `${a} \r\n+ ${b}`;
+                mathText.textContent = `${a} + ${b}`;
                 break;
             case '-':
                 a = numGen0();
                 b = numGen0();
                 correctAnswer = a - b;
-                mathText.textContent = `${a} \r\n- ${b}`;
+                mathText.textContent = `${a} - ${b}`;
                 break;
             case 'x':
                 a = numGen0();
@@ -291,8 +295,8 @@ let gameStart = () => {
     /*BOARD BOTTOM*/
     let inputArea = document.createElement('input');
     inputArea.setAttribute('id', 'user-answer');
-
-    inputArea.addEventListener('keypress', (event) => {
+    inputArea.setAttribute('inputmode', 'none')
+    inputArea.addEventListener('keydown', (event) => {
         if (event.key === "Enter") {
             inputAnswer = +(inputArea.value);
             if (numRegex.test(inputAnswer)) {
@@ -301,9 +305,11 @@ let gameStart = () => {
                     {
                         mathText: mathText.textContent,
                         userAnswer: inputAnswer,
-                        answerResult: answerCheck(inputAnswer, correctAnswer)
+                        answerResult: answerCheck(inputAnswer, correctAnswer),
+                        RightAnswer: correctAnswer
                     }
                 )
+                //console.log(answerCheck(inputAnswer, correctAnswer))
                 inputArea.value = "";
                 mathGen()
             } else {
@@ -312,10 +318,54 @@ let gameStart = () => {
             }
         }
     })
+    /*Mobile keypad*/
+    let keypadDiv = document.createElement('div');
+    keypadDiv.classList.add('keypad');
 
+    keypadKeys.forEach((keys) => {
+        let key = document.createElement('button');
+        key.classList.add('keypad-key')
+        key.setAttribute('data-key', `${keys}`)
+        key.textContent = `${keys}`
+
+        keypadDiv.appendChild(key);
+    })
+
+    let keypadBtn = keypadDiv.querySelectorAll('[data-key]');
+
+    keypadBtn.forEach(btn => {
+        btn.addEventListener('click', () => {
+            let target = document.getElementById('user-answer');
+            switch (btn.textContent) {
+                case 'ENTER':
+                    let enterEvt = new KeyboardEvent('keydown', {
+                        "key": "Enter",
+                        "keyCode": 13,
+                        "which": 13,
+                        "code": "Enter",
+                        "location": 0,
+                        "altKey": false,
+                        "ctrlKey": false,
+                        "metaKey": false,
+                        "shiftKey": false,
+                        "repeat": false
+                    });
+                    target.dispatchEvent(enterEvt)
+                    break;
+                case 'DEL':
+                    target.value = target.value.substring(0, target.value.length-1)
+                    break;
+                case 'C':
+                    target.value = '';
+                    break;
+                default:
+                    target.value += btn.textContent
+            }
+        })
+    })
     /*ELEMENT RENDER*/
     boardTop.replaceChildren(timeBar, mathText);
-    boardBot.replaceChildren(inputArea);
+    boardBot.replaceChildren(inputArea, keypadDiv);
     inputArea.focus(); //To type immediately in the answer box
 
     /*FUNCTION CALLBACK 1min TIMER*/
@@ -332,6 +382,9 @@ let gameStart = () => {
 RESULT PAGE
 ###########*/
 let resultWindow = () => {
+    /*PLACEHOLDER:mathActive class for board-top and board-bot for mobile keypad*/
+    boardTop.classList.remove('mobile');
+    boardBot.classList.remove('mobile');
     /*FUNCTION VARIABLES*/
 
     /*BOARD TOP*/
@@ -344,9 +397,10 @@ let resultWindow = () => {
 
     resultHistory.forEach(result => {
         let answerLine = document.createElement('li');
+
         resultList.appendChild(answerLine);
         answerLine.classList.add('answer');
-        answerLine.textContent = `${result.mathText} = ${result.userAnswer}`;
+        answerLine.innerHTML = `${result.mathText} = ${result.userAnswer} <span>${result.RightAnswer}</span>`;
         answerLine.setAttribute('data-result', `${result.answerResult}`)
     })
 

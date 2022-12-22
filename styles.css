@@ -26,6 +26,18 @@ VARIABLES
     --color-sub-h: 360;
     --color-sub-s: 100%;
     --color-sub-l: 100%;
+    /*####RED*/
+    --color-red-h: 360;
+    --color-red-s: 100%;
+    --color-red-l: 46%;
+    /*####DARK BROW*/
+    --color-brown-h: 0;
+    --color-brown-s: 56%;
+    --color-brown-l: 14%;
+    /*####DARK GREY FOR NUMPAD*/
+    --color-pad-h: 0;
+    --color-pad-s: 0%;
+    --color-pad-l: 30%;
     /*FONT*/
     --ff-outside: 'Schoolbell', cursive;
     --ff-inside: 'Fredericka the Great', cursive;
@@ -47,7 +59,7 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    /*height: 100%;*/
 }
 
 header {
@@ -61,7 +73,7 @@ main>header>h1 {
     font-family: var(--ff-outside);
     font-size: var(--fs-title);
     margin: 0;
-    user-select:  none;
+    user-select: none;
 }
 
 
@@ -80,7 +92,7 @@ main>header>h1 {
     background-image: url('./src/img/board.jpg');
     background-size: cover;
     background-color: hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l));
-    border: solid 5px rgb(56, 16, 16);
+    border: solid 5px hsl(var(--color-brown-h), var(--color-brown-s), var(--color-brown-l));
 }
 
 
@@ -119,7 +131,7 @@ main>header>h1 {
 }
 
 @media (max-width: 720px) {
-    main>h1 {
+    main>header>h1 {
         font-size: var(--fs-normal)
     }
 
@@ -127,6 +139,15 @@ main>header>h1 {
         width: 100%;
         min-width: 100%;
     }
+
+    #board-top.mobile {
+        height: 25%;
+    }
+
+    #board-bot.mobile {
+        height: 75%;
+    }
+
     .button:hover {
         transform: scale(1);
         cursor: pointer;
@@ -141,8 +162,8 @@ HELP DIALOG
     cursor: pointer;
 }
 
-.help > svg {
-    width:  var(--fs-normal);
+.help>svg {
+    width: var(--fs-normal);
     margin-left: 1rem;
 }
 
@@ -154,7 +175,7 @@ dialog {
     background-image: url('./src/img/board.jpg');
     background-size: cover;
     background-color: hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l));
-    border: solid 3px rgb(56, 16, 16);
+    border: solid 3px hsl(var(--color-brown-h), var(--color-brown-s), var(--color-brown-l));
 }
 
 .lang-btn {
@@ -162,7 +183,8 @@ dialog {
     width: 100%;
 }
 
-.lang-btn>button, #modal-close {
+.lang-btn>button,
+#modal-close {
     background-color: transparent;
     border: none;
     font-family: var(--ff-inside);
@@ -184,13 +206,14 @@ dialog {
     text-align: justify;
 }
 
-.help-text.active{
+.help-text.active {
     display: block;
 }
 
 #modal-close {
     font-size: var(--fs-note);
-    transition: ease-in-out 0.5s;}
+    transition: ease-in-out 0.5s;
+}
 
 #modal-close:hover {
     border: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l)) solid 2px;
@@ -202,12 +225,12 @@ START PAGE CSS
 .setting-title {
     font-size: var(--fs-normal);
     margin-bottom: 1.5rem;
-    user-select:  none;
+    user-select: none;
 }
 
 .setting-window {
-    user-select:  none;
-    font-size:  var(--fs-note);
+    user-select: none;
+    font-size: var(--fs-note);
     width: 100%;
     height: max-content;
     display: flex;
@@ -217,7 +240,7 @@ START PAGE CSS
     gap: 1.5rem;
 }
 
-.setting-option  {
+.setting-option {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -228,7 +251,7 @@ START PAGE CSS
 
 
 .setting-option:nth-child(1)::before {
-    content: 'Time';
+    content: 'Timer'
 }
 
 .setting-option:nth-child(2)::before {
@@ -248,9 +271,9 @@ START PAGE CSS
     scale: 1.2;
 }
 
-.setting-checkbox:checked ~  span {
+.setting-checkbox:checked~span {
     /*FROM https://codepen.io/tracilynn/pen/vKqNZO?editors=1100*/
-    border: 10px solid rgba(255,255,255,.8);
+    border: 10px solid hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
     border-image: url("https://www.unicefusa.org/sites/default/files/answer-box.png") 20;
 }
 
@@ -274,6 +297,18 @@ START PAGE CSS
     left: 30%;
     top: -75%;
     transform: rotate(10deg)
+}
+
+@media (max-width: 650px) {
+    .setting-option {
+        flex-wrap: wrap;
+    }
+
+    .setting-option::before {
+        width: 100%;
+    }
+
+
 }
 
 /*#########
@@ -328,9 +363,51 @@ GAMES START CSS
     font-size: var(--fs-normal);
 }
 
+.keypad {
+    width: 70%;
+    height: 60%;
+    display: none;
+    grid-template-columns: repeat(6, 1fr);
+
+}
+
+.keypad-key {
+    grid-column: span 2;
+    font-size: var(--fs-detail);
+    background-color: hsl(var(--color-pad-h), var(--color-pad-s), var(--color-pad-l));
+    color: hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    border: solid 2px hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+}
+
+.keypad-key:nth-child(1) {
+    grid-column: 1/4;
+    background-color: hsl(var(--color-red-h), var(--color-red-s), var(--color-red-l));
+}
+
+.keypad-key:nth-child(2) {
+    grid-column: 4/7;
+    background-color: hsl(var(--color-red-h), var(--color-red-s), var(--color-red-l));
+}
+
+.keypad-key:last-child {
+    --color-main-l: 25%;
+    grid-column: 1/7;
+    background-color: hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l))
+}
+
+.keypad-key:active {
+    --color-pad-l: 10%;
+    --color-red-l: 26%;
+    --color-main-l: 40%;
+}
+
 @media (max-width: 720px) {
     #user-answer {
         width: 75%;
+    }
+
+    .keypad {
+        display: grid;
     }
 }
 
@@ -366,9 +443,22 @@ RESULT WINDOW CSS
     font-size: var(--fs-note);
 }
 
+.answer>span  {
+    --color-main-l: 80%;
+    color:hsl(var(--color-main-h), var(--color-main-s), var(--color-main-l));
+    /*FROM https://codepen.io/tracilynn/pen/vKqNZO?editors=1100*/
+    border: 10px solid hsl(var(--color-sub-h), var(--color-sub-s), var(--color-sub-l));
+    border-image: url("https://www.unicefusa.org/sites/default/files/answer-box.png") 20;
+    padding: 0.2rem;
+}
+
+.answer[data-result='correct']>span {
+    display: none;
+}
+
 .answer[data-result='wrong'] {
-    border: solid 2px hsla(360, 100%, 46%, 1);
-    background-color: hsla(360, 100%, 46%, 1);
+    background-color: hsl(var(--color-red-h), var(--color-red-s), var(--color-red-l));
+    padding: 0.5rem 0 0.5rem 0.5rem;
 }
 
 .result-text {
@@ -376,3 +466,18 @@ RESULT WINDOW CSS
     text-transform: uppercase;
 }
 
+/*#########
+FOOTER
+##########*/
+.attribution {
+    width: inherit;
+    font-family: var(--ff-outside);
+    font-size: var(--fs-detail);
+    text-align: center;
+    user-select: none;
+}
+
+.social-link {
+    text-decoration: none;
+    color: inherit
+}
